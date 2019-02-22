@@ -1,12 +1,23 @@
-import { LitElement, html, customElement, property } from 'lit-element';
+import { LitElement, html, customElement, property, css } from 'lit-element';
 
 @customElement('app-navbar')
 class Navbar extends LitElement {
+    static styles = css`
+    `
+
     render() {
         return html`
-        <app-toolbar>
-        <div main-title>Name</div>
-        </app-toolbar>
+        <app-header-layout>
+            <app-header slot="header">
+                <app-toolbar class="navbar">
+                    <slot name="toggle"></slot>
+                    <div main-title>Name</div>
+                    <paper-button raised>
+                        <iron-icon icon="perm-identity"></iron-icon>Login
+                    </paper-button>
+                </app-toolbar>
+            </app-header>
+        </app-header-layout>
     `;
     }
 }

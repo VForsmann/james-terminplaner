@@ -4,7 +4,7 @@ import { LitElement, html, customElement, property } from 'lit-element';
 class Sidebar extends LitElement {
     render() {
         return html`
-    Sidebar
+        <p>Test</p>
     `;
     }
 }
