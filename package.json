@@ -27,8 +27,15 @@
   "dependencies": {
     "@polymer/app-layout": "^3.0.2",
     "@polymer/iron-icons": "^3.0.1",
+    "@polymer/iron-swipeable-container": "^3.0.1",
     "@polymer/paper-button": "^3.0.1",
+    "@polymer/paper-card": "^3.0.1",
     "@polymer/paper-icon-button": "^3.0.2",
-    "@types/node": "^11.9.4"
+    "@polymer/paper-item": "^3.0.1",
+    "@types/node": "^11.9.4",
+    "nanoid": "^2.0.1",
+    "pwa-helpers": "^0.9.1",
+    "redux": "^4.0.1",
+    "reselect": "^4.0.0"
   }
 }
