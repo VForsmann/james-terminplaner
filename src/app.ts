@@ -1,8 +1,8 @@
-
 import { LitElement, html, customElement, property, css } from 'lit-element';
 
 @customElement('app-container')
 class App extends LitElement {
+
   static styles = css`
 
   app-header {
@@ -31,6 +31,10 @@ class App extends LitElement {
   }
   `
 
+  constructor() {
+    super();
+  }
+
   toggleSidebar() {
     // Das hier ist ganz ganz böse, aber Webcomponents sind so Frisch, da gibts noch einige Stoplerstellen mit TS, also geht das :)
     let drawerLayout = this.shadowRoot!.querySelector('#drawerLayout') as any;
@@ -49,7 +53,7 @@ class App extends LitElement {
           <app-header fixed effects="waterfall" slot="header">
             <app-toolbar>
               <paper-icon-button @click="${() => this.toggleSidebar()}" icon="menu"></paper-icon-button>
-              <div main-title>Inbox</div>
+              <app-navbar></app-navbar>
             </app-toolbar>
           </app-header>
         

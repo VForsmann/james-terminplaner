@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "@polymer/app-layout": "^3.0.2",
+    "@polymer/app-route": "^3.0.2",
     "@polymer/iron-icons": "^3.0.1",
     "@polymer/iron-swipeable-container": "^3.0.1",
     "@polymer/paper-button": "^3.0.1",
