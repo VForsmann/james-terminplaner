@@ -3,137 +3,64 @@ import { LitElement, html, customElement, property, css, TemplateResult, support
 @customElement('app-lit-router')
 class LitRouter extends LitElement {
     @property() routings = [{ pattern: '', component: html`` }];
-    router = Router.Instance;
 
     constructor() {
         super();
-        this.router.subscribe(() => this.requestUpdate());
+        Router.subscribe(() => this.requestUpdate());
     }
 
     render() {
         let result;
         this.routings.forEach(r => {
-            if (this.router.getPath() === (r.pattern)) {
+            if (Router.path.includes(r.pattern)) {
                 result = r.component;
             }
         })
-        
+
         return result ? result : html`ROUTE NOT DEFINED`;
     }
 }
 
-export type RouteListener = (relUrl: string) => void;
-export type Unsubscribe = () => void;
-export class Router {
-    private listeners: RouteListener[] = [];
-    private rootPath = "/";
-    private static _instance: Router;
-
-    private constructor() {
-        window.onpopstate = () => this.notifyListeners();
-        document.addEventListener('click', (event: MouseEvent) => {
-            if (!this.shouldIgnoreEvent(event)) {
-                let anchor = this.getAnchor(event); // a-Element ermitteln
-                if (anchor && !this.shouldIgnoreAnchor(anchor)) { // nur interne Links
-                    event.preventDefault();
-                    this.navigate(anchor.pathname + anchor.search + anchor.hash);
-                }
-            }
-        });
-        if (document.getElementsByTagName("base").length > 0) {
-            this.rootPath = document.getElementsByTagName("base")[0].getAttribute("href")!;
-        }
-    }
+class InnerRouter {
+    private listener: Function[] = [];
+    private root = "/";
+    private static _instance: InnerRouter;
 
     public static get Instance() {
-        // Do you need arguments? Make it a regular static method instead.
         return this._instance || (this._instance = new this());
     }
 
-    subscribe(listener: RouteListener): Unsubscribe {
-        this.listeners.push(listener);
-        return () => { // unsubscribe function
-            this.listeners = this.listeners.filter(other => other !== listener);
+    get path() {
+        return this.appendNoRoot(location.pathname);
+    }
+
+    subscribe(listener: Function) : Function {
+        this.listener.push(listener);
+        return () => {
+            this.listener = this.listener.filter(other => other !== listener);
         };
     }
 
     navigate(relUrl: string) {
-        history.pushState(null, '', this.withRootPath(relUrl));
-        this.notifyListeners();
+        history.pushState(null, '', this.appendRoot(relUrl));
+        this.updateListener();
     }
 
-    // e. g. 'user/sign-in' (without leading slash)
-    getPath() {
-        /* debugger; */
-        return this.withoutRootPath(location.pathname);
+    private updateListener() {
+        const path = this.path;
+        this.listener.forEach(listener => listener(path));
     }
 
-    private notifyListeners() {
-        const path = this.getPath();
-        this.listeners.forEach(listener => listener(path));
+    private appendRoot(relURL: string) {
+        return relURL.startsWith(this.root) ? relURL : this.root + relURL;
     }
 
-    private shouldIgnoreEvent(event: MouseEvent) {
-        return (event.defaultPrevented || event.button !== 0 ||
-            (event.shiftKey || event.ctrlKey || event.altKey || event.metaKey));
-    }
-
-    private getAnchor(event: MouseEvent): HTMLAnchorElement {
-        for (let target of event.composedPath ? event.composedPath() : []) {
-            if (this.isAnchor(target as HTMLElement)) {
-                return target as HTMLAnchorElement;
-            }
-        }
-        let elem: any = event.target;
-        while (elem && !this.isAnchor(elem)) {
-            elem = elem.parentNode;
-        }
-        return (elem && this.isAnchor(elem)) ? elem : null;
-    }
-
-    private isAnchor(elem: HTMLElement) {
-        return elem.nodeName && elem.nodeName.toLowerCase() === 'a';
-    }
-
-    private shouldIgnoreAnchor(anchor: HTMLAnchorElement) {
-        if (anchor.target && anchor.target.toLowerCase() !== '_self') {
-            return true; // it has a non-default target
-        }
-
-        if (anchor.hasAttribute('download')) {
-            return true;
-        }
-
-        if (this.withRootPath(anchor.pathname) === window.location.pathname && anchor.hash !== '') {
-            return true; // target URL is a fragment on the current page
-        }
-
-        const origin = anchor.origin || this.getAnchorOrigin(anchor);
-        if (origin !== window.location.origin) {
-            return true; // target is external to the app
-        }
-    }
-
-    private getAnchorOrigin(anchor: HTMLAnchorElement) {
-        const port = anchor.port;
-        const protocol = anchor.protocol;
-        const defaultHttp = protocol === 'http:' && port === '80';
-        const defaultHttps = protocol === 'https:' && port === '443';
-        const host = (defaultHttp || defaultHttps) ? anchor.hostname : anchor.host;
-        return `${protocol}//${host}`;
-    }
-
-    private withRootPath(relURL: string) {
-        return relURL.startsWith(this.rootPath) ? relURL : this.rootPath + relURL;
-    }
-
-    private withoutRootPath(relURL: string) {
-        if (relURL.startsWith(this.rootPath)) {
-            return relURL.substring(this.rootPath.length);
+    private appendNoRoot(relURL: string) {
+        if (relURL.startsWith(this.root)) {
+            return relURL.substring(this.root.length); 
         } else {
             return relURL;
         }
     }
 }
-
-export const router = Router.Instance;
+export const Router = InnerRouter.Instance;

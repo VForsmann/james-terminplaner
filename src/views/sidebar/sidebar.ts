@@ -9,7 +9,7 @@ class Sidebar extends LitElement {
             pattern: "test",
             component:
                 html`
-                <paper-icon-item @click=${() => Router.Instance.navigate("demo")}>
+                <paper-icon-item @click=${() => Router.navigate("demo/59399")}>
                     <iron-icon icon="inbox" slot="item-icon"></iron-icon>
                     <span>Inbox</span>
                 </paper-icon-item>`
@@ -17,7 +17,7 @@ class Sidebar extends LitElement {
         {
             pattern: "demo",
             component: html`
-            <paper-icon-item @click=${() => Router.Instance.navigate("test")}>
+            <paper-icon-item @click=${() => Router.navigate("test")}>
                 <iron-icon icon="query-builder" slot="item-icon"></iron-icon> <span>Snoozed</span>
             </paper-icon-item>`
         }

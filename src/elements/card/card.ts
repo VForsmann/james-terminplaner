@@ -9,7 +9,7 @@ class Card extends LitElement {
     render() {
         const routings = [
             {
-                pattern: "demo",
+                pattern: "59399",
                 component: html`<div>${this.message}</div>`
             }
         ]
